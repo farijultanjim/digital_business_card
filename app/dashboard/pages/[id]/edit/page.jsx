@@ -64,11 +64,14 @@ import { ParagraphModal } from "@/components/modals/ParagraphModal";
 import { ImageModal } from "@/components/modals/ImageModal";
 import { SocialLinksModal } from "@/components/modals/SocialLinksModal";
 import { HealthDataModal } from "@/components/modals/HealthDataModal";
-import { set } from "react-hook-form";
+import { CollapsibleHealthRecords } from "@/components/CollapsibleHealthRecords";
 
 // Sortable Link Item Component
 const SortableLink = ({ section, onEdit, onDelete, onDuplicate }) => {
   const [activeMenu, setActiveMenu] = useState(null);
+  const handleClickOutside = () => {
+    setActiveMenu(null);
+  };
 
   const {
     attributes,
@@ -154,11 +157,12 @@ const SortableLink = ({ section, onEdit, onDelete, onDuplicate }) => {
         </>
       );
     } else if (section.type === "health") {
+      const recordsCount = section.data.records.length;
       return (
         <>
-          <h3 className="font-medium">{section.data.name}</h3>
+          <h3 className="font-medium">Health Records</h3>
           <p className="text-sm text-gray-500">
-            {section.data.type} - {section.data.date}
+            {recordsCount} {recordsCount === 1 ? "record" : "records"} added
           </p>
         </>
       );
@@ -200,7 +204,10 @@ const SortableLink = ({ section, onEdit, onDelete, onDuplicate }) => {
             {/* Dropdown Menu */}
             {activeMenu === section.id && (
               <>
-                <div className="fixed  " />
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={handleClickOutside}
+                />
                 <div className="absolute right-0  rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
                   <div className="py-1" role="menu">
                     <button
@@ -388,35 +395,61 @@ export default function EditPagePage() {
     setIsImageModalOpen(false);
   };
 
-
   const handleSocialLinksSubmit = (socialData) => {
-    setSections([
-      ...sections,
-      {
-        id: Date.now().toString(),
-        type: "socials",
-        data: socialData,
-      },
-    ]);
+    if (editingSection) {
+      // Update existing section
+      setSections(
+        sections.map((section) =>
+          section.id === editingSection.id
+            ? { ...section, data: socialData }
+            : section
+        )
+      );
+      setEditingSection(null);
+    } else {
+      // Add new section
+      setSections([
+        ...sections,
+        {
+          id: Date.now().toString(),
+          type: "socials",
+          data: socialData,
+        },
+      ]);
+    }
+    setIsSocialLinksModalOpen(false);
   };
 
   const handleHealthDataSubmit = (records) => {
-    // Add each record as a separate section
-    records.forEach((record) => {
+    if (editingSection) {
+      // Update existing section
+      setSections(
+        sections.map((section) =>
+          section.id === editingSection.id
+            ? {
+                ...section,
+                data: {
+                  records: records, // Store all records in an array
+                },
+              }
+            : section
+        )
+      );
+      setEditingSection(null);
+    } else {
+      // Add new section with all records
       setSections((prevSections) => [
         ...prevSections,
         {
           id: Date.now().toString() + Math.random(),
           type: "health",
           data: {
-            name: record.name,
-            type: record.type,
-            date: record.date,
-            image: record.image,
+            records: records, // Store all records in an array
           },
         },
       ]);
-    });
+    }
+    setIsHealthDataModalOpen(false);
   };
 
   const handleLinkModalClose = () => {
@@ -713,34 +746,40 @@ export default function EditPagePage() {
           </div>
         );
       } else if (section.type === "health") {
-        return (
-          <div key={section.id} className="bg-white rounded-lg shadow-sm p-4">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Stethoscope className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">{section.data.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    {section.data.type} - {section.data.date}
-                  </p>
-                </div>
-              </div>
-              {section.data.image && (
-                <div className="relative w-full h-48">
-                  <Image
-                    src={URL.createObjectURL(section.data.image)}
-                    alt={section.data.name}
-                    fill
-                    className="object-contain rounded-lg"
-                    unoptimized
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        );
+        // return (
+        //   <div key={section.id} className="bg-white rounded-lg shadow-sm p-4">
+        //     <div className="space-y-4">
+        //       <div className="flex items-center gap-3">
+        //         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+        //           <Stethoscope className="w-5 h-5 text-primary" />
+        //         </div>
+        //         <div>
+        //           <h3 className="font-medium">{section.data.name}</h3>
+        //           <p className="text-sm text-gray-500">
+        //             {section.data.type} - {section.data.date}
+        //           </p>
+        //         </div>
+        //       </div>
+        //       {section.data.image && (
+        //         <div className="relative w-full h-48">
+        //           <Image
+        //             src={URL.createObjectURL(section.data.image)}
+        //             alt={section.data.name}
+        //             fill
+        //             className="object-contain rounded-lg"
+        //             unoptimized
+        //           />
+        //         </div>
+        //       )}
+        //     </div>
+        //   </div>
+        // );
+      return (
+        <div key={section.id} className="bg-white rounded-lg shadow-sm p-4">
+          {/* Records Preview */}
+          <CollapsibleHealthRecords records={section.data.records} />
+        </div>
+      );
       }
 
       return null;
@@ -803,7 +842,9 @@ export default function EditPagePage() {
         isOpen={isHealthDataModalOpen}
         onClose={handleHealthDataModalClose}
         onSubmit={handleHealthDataSubmit}
-        editData={editingSection?.type === "health" ? editingSection.data : null}
+        editData={
+          editingSection?.type === "health" ? editingSection.data : null
+        }
       />
 
       {/* Tabs and Add Section Button */}

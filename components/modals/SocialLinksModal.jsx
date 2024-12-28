@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, MessagesSquare } from "lucide-react";
 import { HexColorPicker } from "react-colorful";
 
-export const SocialLinksModal = ({ isOpen, onClose, onSubmit }) => {
+export const SocialLinksModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  editData = null,
+}) => {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [formData, setFormData] = useState({
     iconColor: "#000000",
@@ -27,6 +32,39 @@ export const SocialLinksModal = ({ isOpen, onClose, onSubmit }) => {
     reddit: "",
     address: "",
   });
+
+  useEffect(() => {
+    if (isOpen && editData) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        ...editData,
+      }));
+    } else if (!isOpen) {
+      setFormData({
+        iconColor: "#000000",
+        iconSize: "medium",
+        email: "",
+        phone: "",
+        telegram: "",
+        whatsapp: "",
+        facebook: "",
+        messenger: "",
+        instagram: "",
+        twitter: "",
+        tiktok: "",
+        youtube: "",
+        linkedin: "",
+        spotify: "",
+        pinterest: "",
+        snapchat: "",
+        twitch: "",
+        discord: "",
+        thread: "",
+        reddit: "",
+        address: "",
+      });
+    }
+  }, [isOpen, editData]);
 
   const iconSizes = [
     { value: "small", label: "Small" },
@@ -89,7 +127,7 @@ export const SocialLinksModal = ({ isOpen, onClose, onSubmit }) => {
               <MessagesSquare className="w-5 h-5 text-primary" />
             </div>
             <h2 className="text-2xl font-semibold text-gray-800">
-              Social Links
+              {editData ? "Edit Social Links" : "Add Social Links"}
             </h2>
           </div>
           <button
@@ -189,7 +227,7 @@ export const SocialLinksModal = ({ isOpen, onClose, onSubmit }) => {
               type="submit"
               className="px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200 font-medium"
             >
-              Save Changes
+              {editData ? "Save Changes" : "Add Social Links"}
             </button>
           </div>
         </form>

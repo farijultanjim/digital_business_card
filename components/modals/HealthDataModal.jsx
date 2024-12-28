@@ -1,19 +1,39 @@
 // components/modals/HealthDataModal.jsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, Stethoscope, Plus, Image as ImageIcon } from "lucide-react";
 
-export const HealthDataModal = ({ isOpen, onClose, onSubmit }) => {
+export const HealthDataModal = ({ isOpen, onClose, onSubmit, editData = null }) => {
   const [records, setRecords] = useState([
     {
       id: Date.now(),
       name: "",
-      type: "prescription", // or "report"
+      type: "prescription",
       image: null,
       date: "",
     },
   ]);
+
+  useEffect(() => {
+    if (isOpen && editData) {
+      // Check if editData has records array and use it
+      if (editData.records && Array.isArray(editData.records)) {
+        setRecords(editData.records);
+      }
+    } else if (!isOpen) {
+      // Reset form when modal closes
+      setRecords([
+        {
+          id: Date.now(),
+          name: "",
+          type: "prescription",
+          image: null,
+          date: "",
+        },
+      ]);
+    }
+  }, [isOpen, editData]);
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -129,7 +149,9 @@ export const HealthDataModal = ({ isOpen, onClose, onSubmit }) => {
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                 <Stethoscope className="w-4 h-4 text-primary" />
               </div>
-              <h2 className="text-xl font-bold">Add Health Data</h2>
+              <h2 className="text-xl font-bold">
+                {editData ? "Edit Health Data" : "Add Health Data"}
+              </h2>
             </div>
             <button
               onClick={onClose}
@@ -287,7 +309,7 @@ export const HealthDataModal = ({ isOpen, onClose, onSubmit }) => {
                     : "hover:bg-primary/90"
                 }`}
               >
-                {loading ? "Adding..." : "Add Health Data"}
+                {editData ? "Save Changes" : "Add Health Data"}
               </button>
             </div>
           </form>

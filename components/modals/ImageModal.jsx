@@ -7,19 +7,28 @@ import Image from "next/image";
 
 export const ImageModal = ({ isOpen, onClose, onSubmit, editData = null }) => {
   const [formData, setFormData] = useState({
-    imageUrl: editData?.imageUrl || "",
-    alt: editData?.alt || "",
+    imageUrl: "",
+    alt: "",
   });
   const [preview, setPreview] = useState(null);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (isOpen && editData) {
-      setFormData(editData);
+      setFormData({
+        imageUrl: editData.imageUrl || "",
+        alt: editData.alt || "",
+      });
+      // Set preview if there's an existing image URL
+      if (editData.imageUrl && typeof editData.imageUrl === "string") {
+        setPreview(editData.imageUrl);
+      }
     } else if (!isOpen) {
       setFormData({ imageUrl: "", alt: "" });
+      setPreview(null);
     }
   }, [isOpen, editData]);
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -29,15 +38,6 @@ export const ImageModal = ({ isOpen, onClose, onSubmit, editData = null }) => {
         setErrors({
           ...errors,
           image: "Image size should not exceed 2MB",
-        });
-        return;
-      }
-
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        setErrors({
-          ...errors,
-          image: "Please upload a valid image file",
         });
         return;
       }

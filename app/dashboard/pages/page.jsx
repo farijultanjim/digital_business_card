@@ -69,9 +69,12 @@ export default function PagesPage() {
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="w-full divide-y divide-gray-200 overflow-x-scroll">
           <thead>
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Image
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
@@ -90,21 +93,19 @@ export default function PagesPage() {
             {pages.map((page) => (
               <tr key={page.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      <Image
-                        src={page.image}
-                        alt={page.name}
-                        height={40}
-                        width={40}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {page.name}
-                      </div>
-                    </div>
+                  <div className="flex-shrink-0 h-10 w-10">
+                    <Image
+                      src={page.image}
+                      alt={page.name}
+                      height={40}
+                      width={40}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">
+                    {page.name}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
