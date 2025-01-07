@@ -150,13 +150,13 @@ export const SocialLinksModal = ({
                 <button
                   type="button"
                   onClick={() => setShowColorPicker(!showColorPicker)}
-                  className="w-12 h-12 rounded-lg border shadow-sm transition-shadow hover:shadow-md"
+                  className="w-full h-12 rounded-lg border shadow-sm transition-shadow hover:shadow-md"
                   style={{ backgroundColor: formData.iconColor }}
                 />
-                <span className="text-sm font-mono">{formData.iconColor}</span>
+                {/* <span className="text-sm font-mono">{formData.iconColor}</span> */}
               </div>
               {showColorPicker && (
-                <div className="absolute mt-2 z-10 bg-white p-2 rounded-lg shadow-xl">
+                <div className="absolute mt-2 z-10 bg-white p-1  rounded-lg shadow-xl">
                   <HexColorPicker
                     color={formData.iconColor}
                     onChange={(color) => handleInputChange("iconColor", color)}

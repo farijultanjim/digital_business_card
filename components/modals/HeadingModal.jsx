@@ -4,7 +4,12 @@
 import { useEffect, useState } from "react";
 import { X, Heading } from "lucide-react";
 
-export const HeadingModal = ({ isOpen, onClose, onSubmit, editData = null }) => {
+export const HeadingModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  editData = null,
+}) => {
   const [formData, setFormData] = useState({
     type: editData?.type || "h1",
     text: editData?.text || "",
@@ -15,12 +20,15 @@ export const HeadingModal = ({ isOpen, onClose, onSubmit, editData = null }) => 
   const headingTypes = ["h1", "h2", "h3", "h4", "h5", "h6"];
 
   useEffect(() => {
-      if (isOpen && editData) {
-        setFormData(editData);
-      } else if (!isOpen) {
-        setFormData({ type: "", text: "" });
-      }
-    }, [isOpen, editData]);
+    if (isOpen && editData) {
+      setFormData({
+        type: editData.type || "h1",
+        text: editData.text || "",
+      });
+    } else if (!isOpen) {
+      setFormData({ type: "h1", text: "" }); 
+    }
+  }, [isOpen, editData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
