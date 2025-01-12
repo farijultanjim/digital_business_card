@@ -57,6 +57,7 @@ export const LinkModal = ({ isOpen, onClose, onSubmit, editData = null }) => {
 
   return (
     <>
+      {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 z-50" onClick={onClose} />
 
       <div className="fixed inset-0 flex items-center justify-center z-50">

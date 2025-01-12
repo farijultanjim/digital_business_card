@@ -4,7 +4,12 @@
 import { useEffect, useState } from "react";
 import { X, Pilcrow } from "lucide-react";
 
-export const ParagraphModal = ({ isOpen, onClose, onSubmit, editData = null }) => {
+export const ParagraphModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  editData = null,
+}) => {
   const [formData, setFormData] = useState({
     text: editData?.text || "",
   });
@@ -41,8 +46,9 @@ export const ParagraphModal = ({ isOpen, onClose, onSubmit, editData = null }) =
   if (!isOpen) return null;
 
   return (
-    <>
-      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50 " onClick={onClose} />
 
       <div className="fixed inset-0 flex items-center justify-center z-50">
         <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 m-4">
@@ -97,6 +103,6 @@ export const ParagraphModal = ({ isOpen, onClose, onSubmit, editData = null }) =
           </form>
         </div>
       </div>
-    </>
+    </div>
   );
 };

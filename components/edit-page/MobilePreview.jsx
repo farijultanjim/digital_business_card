@@ -213,7 +213,12 @@ export const MobilePreview = ({
             <div className="mt-8">
               <div className="flex flex-col items-center px-4">
                 <div className="w-24 h-24 rounded-full bg-gray-300 mb-4" />
-                <h2 className="text-xl font-bold">{pageData.name}</h2>
+                <h2
+                  className="text-xl font-bold"
+                  style={{ color: pageData.fontColor }}
+                >
+                  {pageData.name}
+                </h2>
               </div>
 
               <div className="my-6 space-y-4 px-5">
@@ -222,7 +227,12 @@ export const MobilePreview = ({
                 <div className="h-32 bg-white rounded-lg shadow-sm" />
                 <div className="h-24 bg-white rounded-lg shadow-sm" />
                 <div className="py-5">
-                  <p className="text-center text-xs">Powered by ROBUST</p>
+                  <p
+                    className="text-center text-xs"
+                    style={{ color: pageData.fontColor }}
+                  >
+                    Powered by ROBUST
+                  </p>
                 </div>
               </div>
             </div>

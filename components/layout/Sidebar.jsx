@@ -12,6 +12,7 @@ import {
   Building2,
   CreditCard,
   X,
+  Unlink,
 } from "lucide-react";
 
 const sidebarLinks = [
@@ -24,6 +25,11 @@ const sidebarLinks = [
     label: "QR Codes",
     icon: QrCode,
     href: "/dashboard/qrcode",
+  },
+  {
+    label: "URL Shortener",
+    icon: Unlink,
+    href: "/dashboard/url-shortener",
   },
   {
     label: "Pages",

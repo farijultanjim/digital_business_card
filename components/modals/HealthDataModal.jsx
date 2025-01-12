@@ -140,7 +140,8 @@ export const HealthDataModal = ({ isOpen, onClose, onSubmit, editData = null }) 
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50 z-50" onClick={onClose} />
 
       <div className="fixed inset-0 flex items-center justify-center z-50">
         <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 m-4 max-h-[90vh] overflow-y-auto">

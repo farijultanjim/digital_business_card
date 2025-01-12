@@ -1,6 +1,50 @@
 import { useState, useEffect } from "react";
-import { Brush, Zap } from "lucide-react";
+import { Brush, Upload, UserCog, Zap } from "lucide-react";
 import { HexColorPicker, HexColorInput } from "react-colorful";
+import Image from "next/image";
+
+const InputField = ({
+  label,
+  name,
+  type = "text",
+  required = true,
+  options = [],
+  value,
+  onChange,
+}) => {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      {type === "select" ? (
+        <select
+          name={name}
+          value={value}
+          onChange={onChange}
+          required={required}
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-white"
+        >
+          <option value="">Select {label}</option>
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          required={required}
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+        />
+      )}
+    </div>
+  );
+};
 
 const simpleGradients = [
   {
@@ -32,11 +76,30 @@ const simpleGradients = [
 const fontOptions = [
   { name: "Default", value: "'Plus Jakarta Sans', system-ui, sans-serif" },
   { name: "Roboto", value: "'Roboto', sans-serif" },
-  { name: "Poppins", value: "'Poppins', sans-serif" },
-  { name: "Playfair Display", value: "'Playfair Display', serif" },
-  { name: "Montserrat", value: "'Montserrat', sans-serif" },
-  { name: "Open Sans", value: "'Open Sans', sans-serif" },
   { name: "Lato", value: "'Lato', sans-serif" },
+  { name: "Poppins", value: "'Poppins', sans-serif" },
+  { name: "Roboto Slab", value: "'Roboto Slab', serif" },
+  { name: "Oswald", value: "'Oswald', sans-serif" },
+  { name: "Lora", value: "'Lora', serif" },
+  { name: "Ubuntu", value: "'Ubuntu', sans-serif" },
+  { name: "Crimson Text", value: "'Crimson Text', serif" },
+  { name: "Titillium Web", value: "'Titillium Web', sans-serif" },
+  { name: "Dosis", value: "'Dosis', sans-serif" },
+  { name: "Josefin Sans", value: "'Josefin Sans', serif" },
+  { name: "Lobster", value: "'Lobster', cursive" },
+  { name: "Play", value: "'Play', serif" },
+  { name: "Playfair Display", value: "'Playfair Display', serif" },
+  { name: "Montserrat", value: "'Montserrat', serif" },
+
+  { name: "Playwrite Austrailia", value: "'Playwrite AU SA', serif" },
+  { name: "Rubik Vinyl", value: "'Rubik Vinyl', serif" },
+  { name: "Jersey 10", value: "'Jersey 10', serif" },
+  { name: "Bebas Neue", value: "'Bebas Neue', serif" },
+  { name: "Playwrite VN", value: "'Playwrite VN', serif" },
+  { name: "Dancing Script", value: "'Dancing Script', serif" },
+  { name: "Pacifico", value: "'Pacifico', serif" },
+  { name: "Caveat", value: "'Caveat', serif" },
+  { name: "Abril Fatface", value: "'Abril Fatface', serif" },
 ];
 
 const BackgroundTypes = {
@@ -47,6 +110,9 @@ const BackgroundTypes = {
 
 export const PageSettings = ({ pageData, updatePageData }) => {
   const [showCustomization, setShowCustomization] = useState(false);
+  const [showEditInfo, setShowEditInfo] = useState(false);
+  const [errors, setErrors] = useState({});
+
   const [backgroundType, setBackgroundType] = useState(
     BackgroundTypes.simpleGradients
   );
@@ -59,9 +125,67 @@ export const PageSettings = ({ pageData, updatePageData }) => {
   const [showColorPicker1, setShowColorPicker1] = useState(false);
   const [showColorPicker2, setShowColorPicker2] = useState(false);
   const [showCustomColorPicker, setShowCustomColorPicker] = useState(false);
+
+  const [fontColor, setFontColor] = useState(pageData.fontColor || "#000000");
+  const [showFontColorPicker, setShowFontColorPicker] = useState(false);
+
   const [fontFamily, setFontFamily] = useState(
     pageData.fontFamily || "'Plus Jakarta Sans', system-ui, sans-serif"
   );
+
+  const [profileImage, setProfileImage] = useState(
+    pageData.profileImage || null
+  );
+
+  const [formData, setFormData] = useState({
+    customerName: pageData.customerName || "",
+    customerId: pageData.customerId || "",
+    dateOfBirth: pageData.dateOfBirth || "",
+    gender: pageData.gender || "",
+    customerPhone: pageData.customerPhone || "",
+    customerEmail: pageData.customerEmail || "",
+    maritalStatus: pageData.maritalStatus || "",
+    membershipType: pageData.membershipType || "",
+    subscription: pageData.subscription || "",
+    membershipStartDate: pageData.membershipStartDate || "",
+  });
+
+  const membershipTypes = ["Silver", "Gold", "Platinum"];
+  const subscriptionTypes = ["Monthly", "Yearly"];
+  const genderOptions = ["Male", "Female", "Other"];
+  const maritalStatusOptions = ["Single", "Married", "Divorced", "Widowed"];
+
+  const handleProfileImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 3 * 1024 * 1024) {
+        setErrors({
+          ...errors,
+          profileImage: "Image size should not exceed 3MB",
+        });
+        return;
+      }
+      setErrors({ ...errors, profileImage: null });
+      const imageUrl = URL.createObjectURL(file);
+      setProfileImage(imageUrl);
+      updatePageData({
+        ...pageData,
+        profileImage: imageUrl,
+      });
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    updatePageData({
+      ...pageData,
+      [name]: value,
+    });
+  };
 
   useEffect(() => {
     // Update background based on type whenever relevant values change
@@ -79,13 +203,18 @@ export const PageSettings = ({ pageData, updatePageData }) => {
       default:
         newBackground = selectedGradient;
     }
-    updatePageData({ ...pageData, backgroundColor: newBackground });
+    updatePageData({
+      ...pageData,
+      backgroundColor: newBackground,
+      fontColor: fontColor,
+    });
   }, [
     backgroundType,
     selectedGradient,
     gradientColor1,
     gradientColor2,
     customColor,
+    fontColor,
     updatePageData,
     pageData,
   ]);
@@ -102,6 +231,7 @@ export const PageSettings = ({ pageData, updatePageData }) => {
         setShowColorPicker1(false);
         setShowColorPicker2(false);
         setShowCustomColorPicker(false);
+        setShowFontColorPicker(false);
       }
     };
 
@@ -272,7 +402,7 @@ export const PageSettings = ({ pageData, updatePageData }) => {
             <label className="text-sm font-medium text-gray-900">
               Font Family
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {fontOptions.map((font) => (
                 <button
                   key={font.value}
@@ -287,6 +417,192 @@ export const PageSettings = ({ pageData, updatePageData }) => {
                   {font.name}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Font Color Section */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-gray-900">
+              Font Color
+            </label>
+            <div className="relative color-picker-container">
+              <div className="space-y-2">
+                <div
+                  onClick={() => setShowFontColorPicker(!showFontColorPicker)}
+                  className="h-10 rounded-lg border cursor-pointer"
+                  style={{ backgroundColor: fontColor }}
+                />
+                <HexColorInput
+                  color={fontColor}
+                  onChange={setFontColor}
+                  className="w-full px-2 py-1 text-sm border rounded"
+                />
+              </div>
+              {showFontColorPicker && (
+                <div className="absolute mt-2 z-20">
+                  <HexColorPicker color={fontColor} onChange={setFontColor} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <button
+        onClick={() => setShowEditInfo(!showEditInfo)}
+        className="px-4 py-2.5 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all w-full flex justify-center items-center gap-2 font-medium"
+      >
+        <UserCog className="w-5 h-5" />
+        Edit Information
+      </button>
+
+      {showEditInfo && (
+        <div className="mt-4 border border-gray-100 rounded-xl p-6 bg-white shadow-sm space-y-6">
+          {/* Profile Image Section */}
+          <div className="space-y-6">
+            <h3 className="text-lg font-medium text-gray-900">
+              Profile Picture
+            </h3>
+            <div className="flex items-center gap-6">
+              <div className="relative w-32 h-32 rounded-full overflow-hidden bg-primary-light border-2 border-dashed border-primary">
+                {profileImage ? (
+                  <>
+                    <Image
+                      src={profileImage}
+                      alt="Profile"
+                      fill
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileImage(null);
+                        updatePageData({
+                          ...pageData,
+                          profileImage: null,
+                        });
+                      }}
+                      className="absolute inset-0 bg-primary/50 flex items-center justify-center text-white opacity-0 hover:opacity-100 transition-opacity"
+                    >
+                      Change
+                    </button>
+                  </>
+                ) : (
+                  <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-white transition-colors duration-300">
+                    <Upload className="w-6 h-6 text-gray-600" />
+                    <span className="mt-2 text-sm text-gray-600">Upload</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleProfileImageChange}
+                    />
+                  </label>
+                )}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-medium text-gray-700">
+                  Upload Profile Picture
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Recommended size: 300x300px. Maximum file size: 3MB
+                </p>
+                {errors.profileImage && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.profileImage}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Basic Information */}
+          <div className="space-y-6">
+            <h3 className="text-lg font-medium text-gray-900">
+              Basic Information
+            </h3>
+            <div className="grid grid-cols-1  gap-4">
+              <InputField
+                label="Customer Name"
+                name="customerName"
+                value={formData.customerName}
+                onChange={handleInputChange}
+              />
+              <InputField
+                label="Customer ID"
+                name="customerId"
+                value={formData.customerId}
+                onChange={handleInputChange}
+              />
+              <InputField
+                label="Date of Birth"
+                name="dateOfBirth"
+                type="date"
+                value={formData.dateOfBirth}
+                onChange={handleInputChange}
+              />
+              <InputField
+                label="Gender"
+                name="gender"
+                type="select"
+                options={genderOptions}
+                value={formData.gender}
+                onChange={handleInputChange}
+              />
+              <InputField
+                label="Phone Number"
+                name="customerPhone"
+                type="tel"
+                value={formData.customerPhone}
+                onChange={handleInputChange}
+              />
+              <InputField
+                label="Email"
+                name="customerEmail"
+                type="email"
+                value={formData.customerEmail}
+                onChange={handleInputChange}
+              />
+              <InputField
+                label="Marital Status"
+                name="maritalStatus"
+                type="select"
+                options={maritalStatusOptions}
+                value={formData.maritalStatus}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          {/* Membership Details */}
+          <div className="space-y-6">
+            <h3 className="text-lg font-medium text-gray-900">
+              Membership Details
+            </h3>
+            <div className="grid grid-cols-1 gap-4">
+              <InputField
+                label="Membership Type"
+                name="membershipType"
+                type="select"
+                options={membershipTypes}
+                value={formData.membershipType}
+                onChange={handleInputChange}
+              />
+              <InputField
+                label="Subscription"
+                name="subscription"
+                type="select"
+                options={subscriptionTypes}
+                value={formData.subscription}
+                onChange={handleInputChange}
+              />
+              <InputField
+                label="Membership Start Date"
+                name="membershipStartDate"
+                type="date"
+                value={formData.membershipStartDate}
+                onChange={handleInputChange}
+              />
             </div>
           </div>
         </div>

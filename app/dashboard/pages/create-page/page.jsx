@@ -5,7 +5,6 @@ import { Upload, X, Plus, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-// Form components can be separated into their own files
 const InputField = ({
   label,
   name,
@@ -62,14 +61,6 @@ export default function CreatePagePage() {
   const [profileImage, setProfileImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
-  // const [activeSection, setActiveSection] = useState(null);
-  // const [pageSections, setPageSections] = useState([]);
-  // const [healthData, setHealthData] = useState([]);
-
-  // const membershipTypes = ["Silver", "Gold", "Platinum"];
-  // const maritalStatusOptions = ["Single", "Married", "Divorced", "Widowed"];
-  // const subscriptionTypes = ["Monthly", "Yearly"];
 
   const membershipTypes = ["Silver", "Gold", "Platinum"];
   const subscriptionTypes = ["Monthly", "Yearly"];
